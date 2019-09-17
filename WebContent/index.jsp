@@ -12,6 +12,7 @@
 
 	<div ng-controller="mainCtrl">
 		<form name="loginForm" action="login" method="POST">
+			
 			<input type="text" name="loginEmail" ng-model="lEmail" ng-required="true" placeholder="Email">
 			<span ng-show="loginForm.loginEmail.$dirty && loginForm.loginEmail.$error.required">
 				Must enter email
@@ -24,6 +25,7 @@
 			<br><br>
 			
 			<input type="submit" Value="Login" ng-disabled="loginForm.$invalid"> <br>
+			
 			<p>Need an account? <a href="register.jsp">Register Here</a></p>
 		</form>
 	</div>

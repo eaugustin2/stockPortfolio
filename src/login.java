@@ -137,7 +137,7 @@ public class login extends HttpServlet {
 		String[] stockInfo = new String[2];
 		
 		try {
-			Class.forName("com.mysql.cj.jdbs.Driver");
+			Class.forName("com.mysql.cj.jdbc.Driver");
 			String mysqlConnection = "jdbc:mysql://localhost/stockPortfolio?serverTimezone=UTC";
 			String user = "stockInfo";
 			String pwd = "stock123";

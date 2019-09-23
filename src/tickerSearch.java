@@ -7,6 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpResponse;
+
+import kong.unirest.Unirest;
+
 
 @WebServlet("/tickerSearch")
 public class tickerSearch extends HttpServlet {
@@ -30,7 +34,18 @@ public class tickerSearch extends HttpServlet {
 		// TODO Auto-generated method stub
 		//doGet(request, response);
 		
+		String userTicker = request.getParameter("ticker");
+		String tickerQuantity = request.getParameter("tickerQuantity");
 		
+		//This is api call url using ticker gotten from user and api token key
+		//https://cloud.iexapis.com/stable/stock/aapl/quote?token=pk_a4d2e1125be54222ac14a504ed3831ef
+		HttpResponse<String> apiResponse = Unirest.get("https://cloud.iexapis.com/stable/stock/aapl/quote?token=pk_a4d2e1125be54222ac14a504ed3831ef");
+		.asString();
+		response.sendRedirect("portfolio.jsp");
+		
+		/*
+		 * making api calls from tickerSearch
+		 */
 	}
 
 }

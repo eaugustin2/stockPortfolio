@@ -41,10 +41,10 @@ String shares = (String)session.getAttribute("shares");
 
 	<form method="POST" action="tickerSearch" name="buyForm">
 		<input type="text" name="ticker" placeholder="Ticker" ng-model="stockTicker" ng-required="true" ng-minlength="1"> 
-		<span ng-show="buyForm.ticker.$dirty && buyForm.$error.required">This field is required</span>
+		<span ng-show="buyForm.ticker.$dirty && buyForm.ticker.$error.required">This field is required</span>
 		<br>
-		<input type="text" name="tickerQuantity" placeholder="QTY" ng-model="stockQuantity"> 
-		<span ng-show="buyForm.tickerQuantity.$dirty && buyForm.$error.required">This field is required</span>
+		<input type="text" name="tickerQuantity" placeholder="QTY" ng-model="stockQuantity" ng-required="true"> 
+		<span ng-show="buyForm.tickerQuantity.$dirty && buyForm.tickerQuantity.$error.required">This field is required</span>
 		<br>
 		<input type="submit" value="Buy" ng-disabled="buyForm.$invalid">
 	</form>

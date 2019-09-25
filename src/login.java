@@ -146,7 +146,7 @@ public class login extends HttpServlet {
 			
 			Statement s = con.createStatement();
 			
-			ResultSet myResult = s.executeQuery("select * from userTable where email='"+email+"'");
+			ResultSet myResult = s.executeQuery("select * from stockTable where email='"+email+"'");
 			
 			if(myResult.next()) {
 				

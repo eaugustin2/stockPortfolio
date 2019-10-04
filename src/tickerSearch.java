@@ -1,6 +1,7 @@
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.servlet.ServletException;
@@ -77,11 +78,24 @@ public class tickerSearch extends HttpServlet {
 			String symbol = apiResponse.getBody().getObject().getString("symbol");
 			String priceBought = Double.toString(apiResponse.getBody().getObject().getDouble("latestPrice"));// equal to latest price
 			
-			if(canBuy(email,priceBought)) {
+			//if user has enough money to buy stock
+			if(canBuy(email,priceBought,tickerQuantity)) {
 				updateStockTable(email,symbol,tickerQuantity,priceBought); //input into stockTable 
 				//update customers balance once they buy a stock
 				
 				System.out.println("you were able to buy stock");
+				
+				HttpSession stockSession = request.getSession(false);
+				//try setting attribute in session again so that i can be retrieved by jsp file
+				ArrayList<String> tickerArr = new ArrayList<String>();
+				ArrayList<String> shareArr = new ArrayList<String>();
+				
+				tickerArr = getTicker(email);
+				shareArr = getShares(email);
+				
+				stockSession.setAttribute("ticker", tickerArr);
+				stockSession.setAttribute("shares", shareArr);
+				
 				response.sendRedirect("portfolio.jsp");
 			}
 			
@@ -93,17 +107,9 @@ public class tickerSearch extends HttpServlet {
 			}
 			
 			
-			
 		}
 		
-		//System.out.println(email);
-		//System.out.println(apiResponse.getBody().getObject());
 		
-		//response.sendRedirect("portfolio.jsp");
-		
-		/*
-		 * making api calls from tickerSearch
-		 */
 	}
 	
 	//need email, ticker, num of shares, and price bought
@@ -119,26 +125,24 @@ public class tickerSearch extends HttpServlet {
 			
 			
 			//check for preexisitng ticker
-			ResultSet myResult = s.executeQuery("select shares from stockTable where email='"+email+"'AND ticker='"+ticker+"'");
+			ResultSet myResult = s.executeQuery("select * from stockTable where email='"+email+"'AND ticker='"+ticker+"'");
 			
 			if(myResult.next()) {
 				
-				//newUser = false;
 				
-				//add current numOfshares with incoming num of shares
 				int currShares = Integer.parseInt(myResult.getString(3));
 				int incomingShares = Integer.parseInt(numOfShares);
 				int totalShares = currShares+incomingShares;
 				numOfShares = Integer.toString(totalShares);
 				
-				
-			}
-			
-			
-				String query = "insert into stockTable " + "(email,ticker,shares,price_bought)" + "values ('" + email + "','" + ticker + "','" + numOfShares + "','" + priceBought+"')";
-				
+				String query = "update stockTable set shares = '"+numOfShares+"' where email='"+email+"'AND ticker ='"+ticker+"'";
 				s.executeUpdate(query);
-			
+			}
+				
+			else {
+				String query = "insert into stockTable " + "(email,ticker,shares,price_bought)" + "values ('" + email + "','" + ticker + "','" + numOfShares + "','" + priceBought+"')";
+				s.executeUpdate(query);
+			}
 			
 			
 		}
@@ -153,12 +157,11 @@ public class tickerSearch extends HttpServlet {
 		}
 		
 		System.out.println("stock successfully added");
-		
-		//return newUser;
+	
 		
 	}
 	
-	protected boolean canBuy(String email, String priceBought) {
+	protected boolean canBuy(String email, String priceBought, String quantity) {
 		Connection con;
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -170,28 +173,32 @@ public class tickerSearch extends HttpServlet {
 			
 			
 			//check for preexisitng ticker
-			ResultSet myResult = s.executeQuery("select balance from stockUser where email='"+email+"'");
-			
+			ResultSet myResult = s.executeQuery("select * from userTable where email='"+email+"'");
 			
 				
 				//newUser = false;
 			
-				
-				int price = Integer.parseInt(priceBought);
-				int balance = myResult.getInt(5);
-				
-				if(balance - price > 0) {
-					//insert into db
-					//return true
-					String query = "insert into stockUser " + "balance" + "values ('"+ balance+"')";
+				if(myResult.next()) {
 					
-					s.executeUpdate(query);
-					return true;
+					
+					Double price = Double.parseDouble(priceBought);
+					int tickerQuantity = Integer.parseInt(quantity);
+					int stockBalance = myResult.getInt(5);
+					Double remainingBalance = stockBalance - (price*tickerQuantity);
+					if(remainingBalance > 0) {
+						//insert into db
+						//return true
+						
+						//String query = "update userTable " + "(balance)" + "values ('"+remainingBalance+"')";
+						String query = "update userTable set balance = '"+remainingBalance+"' where email='"+email+"'";
+						
+						s.executeUpdate(query);
+						return true;
 
-				}
+					}
 				
-				
-					//return false;
+			}
+						
 				
 		}
 		
@@ -207,6 +214,77 @@ public class tickerSearch extends HttpServlet {
 		//System.out.println("stock successfully added");
 		return false;
 		
+	}
+	
+	protected ArrayList<String> getShares(String email) {
+		Connection con;
+		
+		ArrayList<String> sharesArr = new ArrayList<String>();
+		
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String mysqlConnection = "jdbc:mysql://localhost/stockPortfolio?serverTimezone=UTC";
+			String user = "stockInfo";
+			String pwd = "stock123";
+			
+			con = DriverManager.getConnection(mysqlConnection,user,pwd); 
+			
+			Statement s = con.createStatement();
+			
+			ResultSet myResult = s.executeQuery("select * from stockTable where email='"+email+"'");
+			
+			while(myResult.next()) {
+				sharesArr.add(myResult.getString(3));
+			}
+			
+		}
+		catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return sharesArr;
+	}
+	
+	protected ArrayList<String> getTicker(String email){
+		Connection con;
+		
+		ArrayList<String> tickerArr = new ArrayList<String>();
+		
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String mysqlConnection = "jdbc:mysql://localhost/stockPortfolio?serverTimezone=UTC";
+			String user = "stockInfo";
+			String pwd = "stock123";
+			
+			con = DriverManager.getConnection(mysqlConnection,user,pwd); 
+			
+			Statement s = con.createStatement();
+			
+			ResultSet myResult = s.executeQuery("select * from stockTable where email='"+email+"'");
+			
+			
+			
+			while(myResult.next()) {
+				tickerArr.add(myResult.getString(2));
+			}
+			
+			
+		}
+		catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return tickerArr;
 	}
 	
 

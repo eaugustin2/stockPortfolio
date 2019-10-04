@@ -5,18 +5,21 @@
 <head>
 <meta charset="UTF-8">
 <title>Registration Form</title>
+<link rel="stylesheet" type="text/css" href="styling/styles.css">
 </head>
 <body>
 
-	<h3>Register</h3>
 	
-	<div ng-controller="registerCtrl">
 	
-		<form name="registerForm" method="POST" action="register">
+	<div ng-controller="registerCtrl" id="registerFormContainer">
+	<h3>Register Form</h3>
+	
+		<form name="registerForm" method="POST" action="register" id="registerForm">
 			<input type="text" name="fName" placeholder="First Name" ng-model="firstName" ng-required="true" ng-minlength="2">
 			<span ng-show="registerForm.fName.$dirty && registerForm.fName.$error.required">
 				Must enter a first name
 			</span>
+			
 			
 			<span ng-show="registerForm.fName.$dirty && registerForm.fName.$error.minlength">
 				Must be atleast 2 characters long

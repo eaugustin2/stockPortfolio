@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import stockPortfolio.stock;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.io.PrintWriter;
 
 
@@ -62,17 +63,32 @@ public class login extends HttpServlet {
 			
 			//stock stockP = new stock();
 			//stockP.setEmail(email); //passing over email retrieved from user to access/use stockTable in DB
-			String[] stockInfo = new String[2];
-			 stockInfo = userStockInfo(email);
+			
+			ArrayList<String> tickerArr = new ArrayList<String>();
+			tickerArr = getTicker(email);
+			
+			ArrayList<String> sharesArr = new ArrayList<String>();
+			 sharesArr = getShares(email);
+			 
+			 ArrayList<String> valueArr = new ArrayList<String>();
+			 valueArr = getValues(email);
 			 
 			String userBalanceString = String.valueOf(userBalance);
+			
+			Double sum = 0.0;
+			for(int i =0; i<valueArr.size();i++) {
+				sum+=Double.parseDouble(valueArr.get(i));
+			}
 			
 			HttpSession session = request.getSession();
 			session.setAttribute("email", email);
 			session.setAttribute("balance", userBalanceString);
 			
-			session.setAttribute("ticker", stockInfo[0]);
-			session.setAttribute("shares", stockInfo[1]);
+			//session.setAttribute("ticker", stockInfo[0]);
+			session.setAttribute("ticker", tickerArr);
+			session.setAttribute("shares", sharesArr);
+			session.setAttribute("value", valueArr);
+			session.setAttribute("portfolioValue", sum);
 			
 			session.setMaxInactiveInterval(10*60);
 			
@@ -131,10 +147,11 @@ public class login extends HttpServlet {
 		return -1;
 	}
 	
-	protected String[] userStockInfo(String email) {
+	protected ArrayList<String> getShares(String email) {
 		Connection con;
 		
-		String[] stockInfo = new String[2];
+		ArrayList<String> sharesArr = new ArrayList<String>();
+		
 		
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -148,12 +165,8 @@ public class login extends HttpServlet {
 			
 			ResultSet myResult = s.executeQuery("select * from stockTable where email='"+email+"'");
 			
-			if(myResult.next()) {
-				
-				//return myResult.getInt(5);
-				stockInfo[0] = myResult.getString(2); //ticker
-				stockInfo[1] = myResult.getString(3); //shares
-				
+			while(myResult.next()) {
+				sharesArr.add(myResult.getString(3));
 			}
 			
 		}
@@ -165,7 +178,92 @@ public class login extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		return stockInfo;
+		return sharesArr;
+	}
+	
+	protected ArrayList<String> getTicker(String email){
+		Connection con;
+		
+		ArrayList<String> tickerArr = new ArrayList<String>();
+		
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String mysqlConnection = "jdbc:mysql://localhost/stockPortfolio?serverTimezone=UTC";
+			String user = "stockInfo";
+			String pwd = "stock123";
+			
+			con = DriverManager.getConnection(mysqlConnection,user,pwd); 
+			
+			Statement s = con.createStatement();
+			
+			ResultSet myResult = s.executeQuery("select * from stockTable where email='"+email+"'");
+			
+			
+			
+			while(myResult.next()) {
+				tickerArr.add(myResult.getString(2));
+				
+				//update info based on how many shares they have 
+				
+				
+			}
+			
+			
+		}
+		catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return tickerArr;
+	}
+	
+	protected ArrayList<String> getValues(String email){
+		Connection con;
+		
+		ArrayList<String> valueArr = new ArrayList<String>();
+		
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String mysqlConnection = "jdbc:mysql://localhost/stockPortfolio?serverTimezone=UTC";
+			String user = "stockInfo";
+			String pwd = "stock123";
+			
+			con = DriverManager.getConnection(mysqlConnection,user,pwd); 
+			
+			Statement s = con.createStatement();
+			
+			ResultSet myResult = s.executeQuery("select * from stockTable where email='"+email+"'");
+			
+			
+			
+			while(myResult.next()) {
+				//valueArr.add(myResult.getString(4));
+				
+				int tickerQuantity = Integer.parseInt(myResult.getString(3));
+				Double value = Double.parseDouble(myResult.getString(4));
+				
+				Double totalVal = tickerQuantity * value;
+				String newVal = Double.toString(totalVal);
+				valueArr.add(newVal);
+			}
+			
+			
+		}
+		catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return valueArr;
 	}
 
 }

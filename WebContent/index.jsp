@@ -5,12 +5,24 @@
 <head>
 <meta charset="UTF-8">
 <title>Login</title>
+<link rel="stylesheet" type="text/css" href="styling/styles.css">
 </head>
 <body>
 
-	<h3>Login</h3>
+<div id="flexContainer">
 
-	<div ng-controller="mainCtrl">
+<div id="photoContainer">
+<!-- insert a photo here to be side by side -->
+ <img src="Images/indexPhoto2.jpg" alt="indexPhoto" id="indexPhoto"> 
+
+</div>
+	
+
+	<div ng-controller="mainCtrl" id="loginContainer">
+	
+	<div id="loginForm">
+	<h3>Login</h3>
+	
 		<form name="loginForm" action="login" method="POST">
 			
 			<input type="text" name="loginEmail" ng-model="lEmail" ng-required="true" placeholder="Email">
@@ -29,6 +41,9 @@
 			<p>Need an account? <a href="register.jsp">Register Here</a></p>
 		</form>
 	</div>
+</div>
+
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
 <script src="JS/functionality.js"></script>

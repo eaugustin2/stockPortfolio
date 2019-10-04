@@ -1,0 +1,60 @@
+#listOfStocks{
+	float:left;
+	width: 50%;
+}
+
+#buyStocks{
+	float: right;
+	width:50%;
+	margin-left: 100px;
+}
+
+#verticalLine{
+	height:100%;
+	width: 1px;
+	color: black;
+	margin-left: 100px;
+	margin-right: 100px;
+}
+
+
+.flexContainer{
+	display: flex;
+	flex-direction: row;
+}
+
+#loginContainer{
+	float:right;
+}
+
+#loginForm{
+	margin-top:25%;
+	margin-right: 20%;
+}
+
+#photoContainer{
+	width:80%;
+	height:50%;
+	float:left;
+}
+
+#indexPhoto{
+	margin-top: -12%;
+	width: 70%;
+	
+}
+
+body{
+	background-color: black;
+	color: blue;
+	font-family: fantasy;
+}
+
+#registerFormContainer{
+	text-align: center;
+	margin-top: 50px;
+}
+
+a{
+	color: blue;
+}

@@ -31,11 +31,19 @@ valuesArr = (ArrayList<String>)session.getAttribute("value");
 
 Double sum = (Double)session.getAttribute("portfolioValue");
 
+System.out.println("Size of ticker arr: " + tickerArr.size());
+System.out.println("Size of sharesArr " + sharesArr.size());
+System.out.println("Size of valuesArr " + valuesArr.size());
 
-//System.out.println(tickerArr.get(0));
+/*
 
-//String shares = (String)session.getAttribute("shares");
-//System.out.println(email);
+
+Check size of tickerArr as issue...
+
+
+//  was the issue
+*/
+
 
 %>
 
@@ -44,11 +52,11 @@ Double sum = (Double)session.getAttribute("portfolioValue");
 <div id="listOfStocks">
 	 <!-- Add an angular filter once value comes through -->
 	
-	<h4>Portfolio ({{<%=sum %> | currency}})</h4>
+	<h4>Portfolio  ({{<%=sum %> | currency}}) </h4>
 	
-	<% for(int i =0; i<tickerArr.size();i++){ %>
+	<% for(int i =0; i<tickerArr.size(); i++){ %>
 	
-	<span> <%=tickerArr.get(i) %> <%=sharesArr.get(i) %>  -  share(s)   {{<%=valuesArr.get(i) %> | currency  }} </span> <!-- Put amount that that customer has in that share here -->
+	<span> <%=tickerArr.get(i) %> <%=sharesArr.get(i) %>  -  share(s) {{<%=valuesArr.get(i) %> | currency  }}   </span> <!-- Put amount that that customer has in that share here -->
 	<hr>
 	<%} %>
 	<br>
@@ -71,7 +79,7 @@ Double sum = (Double)session.getAttribute("portfolioValue");
 		<input type="submit" value="Portfolio">
 	</form> -->
 	
-	<a href="transaction.jsp">Transactions</a>
+	
 
 
 	<h4>Cash - {{<%=balance %> | currency}}</h4>
@@ -88,13 +96,6 @@ Double sum = (Double)session.getAttribute("portfolioValue");
 </div>
 
 </div>
-
-
-
-
-
-
-
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>

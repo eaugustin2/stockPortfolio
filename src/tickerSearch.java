@@ -61,9 +61,7 @@ public class tickerSearch extends HttpServlet {
 		
 		final HttpResponse<JsonNode> apiResponse = Unirest.get(apiUrl).asJson();
 		
-		//have to have a way to redirect if user enters an invalid ticker symbol
 		
-		//System.out.println(apiResponse.getBody().getObject().ge);
 		
 		if(apiResponse.getBody() == null) {
 			out.println("<h2>Invalid ticker Symbol</h2>");
@@ -75,6 +73,7 @@ public class tickerSearch extends HttpServlet {
 		
 		//else upload to database which should hopefuly update on front end
 		else {
+			
 			String symbol = apiResponse.getBody().getObject().getString("symbol");
 			String priceBought = Double.toString(apiResponse.getBody().getObject().getDouble("latestPrice"));// equal to latest price
 			
@@ -89,12 +88,19 @@ public class tickerSearch extends HttpServlet {
 				//try setting attribute in session again so that i can be retrieved by jsp file
 				ArrayList<String> tickerArr = new ArrayList<String>();
 				ArrayList<String> shareArr = new ArrayList<String>();
+				ArrayList<String> valuesArr = new ArrayList<String>();
 				
 				tickerArr = getTicker(email);
 				shareArr = getShares(email);
+				valuesArr = getValues(email);
+				
+				System.out.println("size of ticker: " + tickerArr.size());
 				
 				stockSession.setAttribute("ticker", tickerArr);
 				stockSession.setAttribute("shares", shareArr);
+				stockSession.setAttribute("value", valuesArr);
+				
+				System.out.println("data sent to portfolio.jsp");
 				
 				response.sendRedirect("portfolio.jsp");
 			}
@@ -285,6 +291,50 @@ public class tickerSearch extends HttpServlet {
 		}
 		
 		return tickerArr;
+	}
+	
+	protected ArrayList<String> getValues(String email){
+		Connection con;
+		
+		ArrayList<String> valueArr = new ArrayList<String>();
+		
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String mysqlConnection = "jdbc:mysql://localhost/stockPortfolio?serverTimezone=UTC";
+			String user = "stockInfo";
+			String pwd = "stock123";
+			
+			con = DriverManager.getConnection(mysqlConnection,user,pwd); 
+			
+			Statement s = con.createStatement();
+			
+			ResultSet myResult = s.executeQuery("select * from stockTable where email='"+email+"'");
+			
+			
+			
+			while(myResult.next()) {
+				//valueArr.add(myResult.getString(4));
+				
+				int tickerQuantity = Integer.parseInt(myResult.getString(3));
+				Double value = Double.parseDouble(myResult.getString(4));
+				
+				Double totalVal = tickerQuantity * value;
+				String newVal = Double.toString(totalVal);
+				valueArr.add(newVal);
+			}
+			
+			
+		}
+		catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return valueArr;
 	}
 	
 
